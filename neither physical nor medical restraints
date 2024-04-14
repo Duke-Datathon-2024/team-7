@@ -1,0 +1,58 @@
+BEGIN;
+
+CREATE TEMP TABLE physical_restraint AS
+SELECT DISTINCT(ce.subject_id),insurance,language,marital_status,race 
+FROM (`physionet-data.mimiciv_icu.chartevents` ce LEFT JOIN `physionet-data.mimiciv_icu.d_items` di ON ce.itemid = di.itemid) LEFT JOIN `physionet-data.mimiciv_hosp.admissions` a ON ce.hadm_id = a.hadm_id 
+WHERE LOWER(di.label) LIKE '%restraint%' AND label NOT IN ('Safety Restraints NCP - Expected outcomes','Safety Restraints NCP - Goal',
+'Safety Restraints NCP - Interventions'	,'Safety Restraints NCP - Outcomes met','Safety Restraints NCP - Plan revised','Safety Restraints NCP - Problem resolved','Side Rails (Restraint)') AND value NOT IN ('Off','Not Done','Sitter','Sitters','None','Geriatric chair with locked tray table','Seclusion','Security','Holding','0','1')
+ORDER BY subject_id;
+
+CREATE TEMP TABLE medical_restraint AS
+SELECT 
+  e.subject_id,e.hadm_id,insurance,language,marital_status,race,gender,anchor_age
+FROM 
+  `physionet-data.mimiciv_hosp.emar` e
+INNER JOIN 
+  `physionet-data.mimiciv_hosp.emar_detail` ed
+ON 
+  e.emar_id = ed.emar_id 
+INNER JOIN
+  `physionet-data.mimiciv_hosp.patients` p
+ON 
+  e.subject_id = p.subject_id
+INNER JOIN
+  `physionet-data.mimiciv_hosp.admissions` a
+ON
+  e.subject_id = a.subject_id
+INNER JOIN
+  `physionet-data.mimiciv_icu.icustays` icu
+ON
+  e.subject_id = icu.subject_id
+WHERE 
+  REGEXP_CONTAINS(LOWER(e.medication), 'lorazepam|diazepam|midazolam|ziprasidone|aripiprazole|haloperidol|olanzapine|paliperidone|prochlorperazine|chlorpromazine|droperidol')
+  AND ed.dose_given IS NOT NULL
+  AND REGEXP_CONTAINS(LOWER(ed.product_unit), 'ml|vial|syr|mg')
+  AND e.event_txt IS NOT NULL
+  AND e.event_txt NOT LIKE 'Not Given' 
+  AND e.event_txt NOT LIKE 'In Other Location' 
+  AND e.event_txt NOT LIKE 'Hold Dose'
+  AND charttime BETWEEN intime AND outtime
+ORDER BY
+  e.subject_id;
+
+CREATE TEMP TABLE neither AS
+SELECT * FROM `physionet-data.mimiciv_icu.icustays` icu
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM physical_restraint
+  WHERE icu.subject_id = physical_restraint.subject_id
+) AND NOT EXISTS (
+  SELECT 1
+  FROM medical_restraint
+  WHERE icu.subject_id = medical_restraint.subject_id
+);
+
+SELECT DISTINCT(neither.subject_id),stay_id, neither.hadm_id, insurance,language,marital_status,race 
+FROM (neither LEFT JOIN `physionet-data.mimiciv_hosp.admissions` a ON neither.subject_id = a.subject_id); 
+
+COMMIT;
