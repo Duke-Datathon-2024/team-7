@@ -1,0 +1,81 @@
+SELECT
+  subject_id,
+  hadm_id,
+  DATE(charttime) AS date, -- Assuming you want one row per day per patient
+  MAX(IF(label = 'Non-Violent Restraints', value, NULL)) AS Non_Violent_Restraints,
+  MAX(IF(label = 'Non-Violent Restraints Ordered', value, NULL)) AS Non_Violent_Restraints_Ordered,
+  MAX(IF(label = 'Reason for Restraint (Acute Medical/Surgical)_V1', value, NULL)) AS Reason_for_Restraint_Acute_Medical_Surgical_V1,
+  MAX(IF(label = 'Reason for Restraint (Behavioral)_V1', value, NULL)) AS Reason_for_Restraint_Behavioral_V1,
+  MAX(IF(label = 'Reason for Restraint (Non-violent)', value, NULL)) AS Reason_for_Restraint_Non_violent,
+  MAX(IF(label = 'Reason for Restraint (Violent)', value, NULL)) AS Reason_for_Restraint_Violent,
+  MAX(IF(label = 'Reason for Restraint/Seclusion (Violent)', value, NULL)) AS Reason_for_Restraint_Seclusion_Violent,
+  MAX(IF(label = 'Reason for Restraints (Non-Violent)', value, NULL)) AS Reason_for_Restraints_Non_Violent,
+  MAX(IF(label = 'Restraint (Non-violent)', value, NULL)) AS Restraint_Non_violent,
+  MAX(IF(label = 'Restraint Device (Non-Violent)', value, NULL)) AS Restraint_Device_Non_Violent,
+  MAX(IF(label = 'Restraint Device (Non-violent)', value, NULL)) AS Restraint_Device_Non_violent,
+  MAX(IF(label = 'Restraint Device (Violent)', value, NULL)) AS Restraint_Device_Violent,
+  MAX(IF(label = 'Restraint Location', value, NULL)) AS Restraint_Location,
+  MAX(IF(label = 'Restraint Location_V1', value, NULL)) AS Restraint_Location_V1,
+  MAX(IF(label = 'Restraint Location_V2', value, NULL)) AS Restraint_Location_V2,
+  MAX(IF(label = 'Restraint Ordered (Non-violent)', value, NULL)) AS Restraint_Ordered_Non_violent,
+  MAX(IF(label = 'Restraint Type', value, NULL)) AS Restraint_Type,
+  MAX(IF(label = 'Restraint/Seclusion Observer Sheet', value, NULL)) AS Restraint_Seclusion_Observer_Sheet,
+  MAX(IF(label = 'Restraints (Violent)', value, NULL)) AS Restraints_Violent,
+  MAX(IF(label = 'Restraints Evaluated', value, NULL)) AS Restraints_Evaluated,
+  MAX(IF(label = 'Restraints Evaluated_V1', value, NULL)) AS Restraints_Evaluated_V1,
+  MAX(IF(label = 'Restraints Evaluated_V2', value, NULL)) AS Restraints_Evaluated_V2,
+  MAX(IF(label = 'Restraints Ordered', value, NULL)) AS Restraints_Ordered,
+  MAX(IF(label = 'Restraints Ordered (Violent)', value, NULL)) AS Restraints_Ordered_Violent,
+  MAX(IF(label = 'Safety Restraints NCP - Expected outcomes', value, NULL)) AS Safety_Restraints_NCP_Expected_outcomes,
+  MAX(IF(label = 'Safety Restraints NCP - Goal', value, NULL)) AS Safety_Restraints_NCP_Goal,
+  MAX(IF(label = 'Safety Restraints NCP - Interventions', value, NULL)) AS Safety_Restraints_NCP_Interventions,
+  MAX(IF(label = 'Safety Restraints NCP - Outcomes met', value, NULL)) AS Safety_Restraints_NCP_Outcomes_met,
+  MAX(IF(label = 'Safety Restraints NCP - Plan revised', value, NULL)) AS Safety_Restraints_NCP_Plan_revised,
+  MAX(IF(label = 'Safety Restraints NCP - Problem resolved', value, NULL)) AS Safety_Restraints_NCP_Problem_resolved,
+  MAX(IF(label = 'Side Rails (Restraint)', value, NULL)) AS Side_Rails_Restraint,
+  MAX(IF(label = 'Violent Restraints', value, NULL)) AS Violent_Restraints,
+  MAX(IF(label = 'Violent Restraints Ordered', value, NULL)) AS Violent_Restraints_Ordered,
+  insurance,
+  language,
+  marital_status,
+  race,
+  deathtime
+FROM (
+  SELECT
+    ce.subject_id,
+    ce.hadm_id,
+    ce.itemid,
+    di.label,
+    di.category,
+    di.unitname,
+    ce.charttime,
+    ce.value,
+    ce.valuenum,
+    a.insurance,
+    a.language,
+    a.marital_status,
+    a.race,
+    a.deathtime
+  FROM
+    `physionet-data.mimiciv_icu.chartevents` ce
+    LEFT JOIN `physionet-data.mimiciv_icu.d_items` di ON ce.itemid = di.itemid
+    LEFT JOIN `physionet-data.mimiciv_hosp.admissions` a ON ce.hadm_id = a.hadm_id
+  WHERE
+    LOWER(di.label) LIKE '%restraint%' 
+    AND di.label NOT IN ('Safety Restraints NCP - Expected outcomes', 'Safety Restraints NCP - Goal',
+    'Safety Restraints NCP - Interventions', 'Safety Restraints NCP - Outcomes met', 'Safety Restraints NCP - Plan revised', 'Safety Restraints NCP - Problem resolved', 'Side Rails (Restraint)')
+    AND ce.value NOT IN ('Off', 'Not Done', 'Sitter', 'Sitters', 'None', 'Geriatric chair with locked tray table', 'Seclusion', 'Security', 'Holding', '0', '1')
+) subquery
+GROUP BY
+  subject_id,
+  hadm_id,
+  DATE(charttime),
+  insurance,
+  language,
+  marital_status,
+  race,
+  deathtime
+ORDER BY
+  subject_id,
+  hadm_id,
+  date
