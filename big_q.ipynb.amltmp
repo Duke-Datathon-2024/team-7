@@ -1,0 +1,205 @@
+{
+  "cells": [
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install --upgrade google-cloud\n",
+        "!pip install --upgrade google-cloud-bigquery\n",
+        "!pip install --upgrade google-cloud-storage"
+      ],
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": "Collecting google-cloud\n  Downloading google_cloud-0.34.0-py2.py3-none-any.whl (1.8 kB)\nInstalling collected packages: google-cloud\nSuccessfully installed google-cloud-0.34.0\nRequirement already up-to-date: google-cloud-bigquery in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (3.20.1)\nRequirement already satisfied, skipping upgrade: google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-cloud-bigquery) (2.11.0)\nRequirement already satisfied, skipping upgrade: packaging>=20.0.0 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-cloud-bigquery) (23.0)\nRequirement already satisfied, skipping upgrade: python-dateutil<3.0dev,>=2.7.2 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-cloud-bigquery) (2.8.2)\nRequirement already satisfied, skipping upgrade: google-auth<3.0.0dev,>=2.14.1 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-cloud-bigquery) (2.18.1)\nRequirement already satisfied, skipping upgrade: google-resumable-media<3.0dev,>=0.6.0 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-cloud-bigquery) (2.7.0)\nRequirement already satisfied, skipping upgrade: requests<3.0.0dev,>=2.21.0 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-cloud-bigquery) (2.31.0)\nRequirement already satisfied, skipping upgrade: google-cloud-core<3.0.0dev,>=1.6.0 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-cloud-bigquery) (2.4.1)\nRequirement already satisfied, skipping upgrade: protobuf!=3.20.0,!=3.20.1,!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<5.0.0dev,>=3.19.5 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-cloud-bigquery) (3.20.3)\nRequirement already satisfied, skipping upgrade: googleapis-common-protos<2.0dev,>=1.56.2 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-cloud-bigquery) (1.59.0)\nRequirement already satisfied, skipping upgrade: grpcio<2.0dev,>=1.33.2; extra == \"grpc\" in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-cloud-bigquery) (1.54.2)\nRequirement already satisfied, skipping upgrade: grpcio-status<2.0dev,>=1.33.2; extra == \"grpc\" in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-cloud-bigquery) (1.62.1)\nRequirement already satisfied, skipping upgrade: six>=1.5 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from python-dateutil<3.0dev,>=2.7.2->google-cloud-bigquery) (1.16.0)\nRequirement already satisfied, skipping upgrade: rsa<5,>=3.1.4; python_version >= \"3.6\" in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-auth<3.0.0dev,>=2.14.1->google-cloud-bigquery) (4.9)\nRequirement already satisfied, skipping upgrade: pyasn1-modules>=0.2.1 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-auth<3.0.0dev,>=2.14.1->google-cloud-bigquery) (0.3.0)\nRequirement already satisfied, skipping upgrade: cachetools<6.0,>=2.0.0 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-auth<3.0.0dev,>=2.14.1->google-cloud-bigquery) (5.3.0)\nRequirement already satisfied, skipping upgrade: urllib3<2.0 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-auth<3.0.0dev,>=2.14.1->google-cloud-bigquery) (1.26.16)\nRequirement already satisfied, skipping upgrade: google-crc32c<2.0dev,>=1.0 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-resumable-media<3.0dev,>=0.6.0->google-cloud-bigquery) (1.5.0)\nRequirement already satisfied, skipping upgrade: certifi>=2017.4.17 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from requests<3.0.0dev,>=2.21.0->google-cloud-bigquery) (2022.9.24)\nRequirement already satisfied, skipping upgrade: idna<4,>=2.5 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from requests<3.0.0dev,>=2.21.0->google-cloud-bigquery) (3.4)\nRequirement already satisfied, skipping upgrade: charset-normalizer<4,>=2 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from requests<3.0.0dev,>=2.21.0->google-cloud-bigquery) (3.1.0)\nRequirement already satisfied, skipping upgrade: pyasn1>=0.1.3 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from rsa<5,>=3.1.4; python_version >= \"3.6\"->google-auth<3.0.0dev,>=2.14.1->google-cloud-bigquery) (0.5.0)\nCollecting google-cloud-storage\n  Downloading google_cloud_storage-2.16.0-py2.py3-none-any.whl (125 kB)\n\u001b[K     |████████████████████████████████| 125 kB 6.4 MB/s eta 0:00:01\n\u001b[?25hRequirement already satisfied, skipping upgrade: google-cloud-core<3.0dev,>=2.3.0 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-cloud-storage) (2.4.1)\nRequirement already satisfied, skipping upgrade: google-resumable-media>=2.6.0 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-cloud-storage) (2.7.0)\nRequirement already satisfied, skipping upgrade: google-crc32c<2.0dev,>=1.0 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-cloud-storage) (1.5.0)\nRequirement already satisfied, skipping upgrade: requests<3.0.0dev,>=2.18.0 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-cloud-storage) (2.31.0)\nCollecting google-auth<3.0dev,>=2.26.1\n  Downloading google_auth-2.29.0-py2.py3-none-any.whl (189 kB)\n\u001b[K     |████████████████████████████████| 189 kB 17.4 MB/s eta 0:00:01\n\u001b[?25hCollecting google-api-core<3.0.0dev,>=2.15.0\n  Downloading google_api_core-2.18.0-py3-none-any.whl (138 kB)\n\u001b[K     |████████████████████████████████| 138 kB 18.2 MB/s eta 0:00:01\n\u001b[?25hRequirement already satisfied, skipping upgrade: idna<4,>=2.5 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from requests<3.0.0dev,>=2.18.0->google-cloud-storage) (3.4)\nRequirement already satisfied, skipping upgrade: certifi>=2017.4.17 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from requests<3.0.0dev,>=2.18.0->google-cloud-storage) (2022.9.24)\nRequirement already satisfied, skipping upgrade: charset-normalizer<4,>=2 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from requests<3.0.0dev,>=2.18.0->google-cloud-storage) (3.1.0)\nRequirement already satisfied, skipping upgrade: urllib3<3,>=1.21.1 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from requests<3.0.0dev,>=2.18.0->google-cloud-storage) (1.26.16)\nRequirement already satisfied, skipping upgrade: pyasn1-modules>=0.2.1 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-auth<3.0dev,>=2.26.1->google-cloud-storage) (0.3.0)\nRequirement already satisfied, skipping upgrade: rsa<5,>=3.1.4 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-auth<3.0dev,>=2.26.1->google-cloud-storage) (4.9)\nRequirement already satisfied, skipping upgrade: cachetools<6.0,>=2.0.0 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-auth<3.0dev,>=2.26.1->google-cloud-storage) (5.3.0)\nRequirement already satisfied, skipping upgrade: googleapis-common-protos<2.0.dev0,>=1.56.2 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-api-core<3.0.0dev,>=2.15.0->google-cloud-storage) (1.59.0)\nRequirement already satisfied, skipping upgrade: protobuf!=3.20.0,!=3.20.1,!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<5.0.0.dev0,>=3.19.5 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from google-api-core<3.0.0dev,>=2.15.0->google-cloud-storage) (3.20.3)\nCollecting proto-plus<2.0.0dev,>=1.22.3\n  Downloading proto_plus-1.23.0-py3-none-any.whl (48 kB)\n\u001b[K     |████████████████████████████████| 48 kB 5.6 MB/s  eta 0:00:01\n\u001b[?25hRequirement already satisfied, skipping upgrade: pyasn1<0.6.0,>=0.4.6 in /anaconda/envs/azureml_py38/lib/python3.8/site-packages (from pyasn1-modules>=0.2.1->google-auth<3.0dev,>=2.26.1->google-cloud-storage) (0.5.0)\n\u001b[31mERROR: azureml-inference-server-http 0.8.4 has requirement flask<2.3.0, but you'll have flask 2.3.2 which is incompatible.\u001b[0m\nInstalling collected packages: google-auth, proto-plus, google-api-core, google-cloud-storage\n  Attempting uninstall: google-auth\n    Found existing installation: google-auth 2.18.1\n    Uninstalling google-auth-2.18.1:\n      Successfully uninstalled google-auth-2.18.1\n  Attempting uninstall: google-api-core\n    Found existing installation: google-api-core 2.11.0\n    Uninstalling google-api-core-2.11.0:\n      Successfully uninstalled google-api-core-2.11.0\nSuccessfully installed google-api-core-2.18.0 google-auth-2.29.0 google-cloud-storage-2.16.0 proto-plus-1.23.0\n"
+        }
+      ],
+      "execution_count": 1,
+      "metadata": {}
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip check"
+      ],
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": "pandas-ml 0.6.1 requires enum34, which is not installed.\r\nwerkzeug 2.3.4 has requirement MarkupSafe>=2.1.1, but you have markupsafe 2.0.1.\r\ntensorflow 2.11.0 has requirement protobuf<3.20,>=3.9.2, but you have protobuf 3.20.3.\r\ntensorboardx 2.6.1 has requirement protobuf>=4.22.3, but you have protobuf 3.20.3.\r\nscikit-image 0.21.0 has requirement networkx>=2.8, but you have networkx 2.5.\r\nscikit-image 0.21.0 has requirement scipy>=1.8, but you have scipy 1.5.3.\r\nresponsibleai 0.27.0 has requirement ipykernel<=6.8.0, but you have ipykernel 6.22.0.\r\nray 2.0.0 has requirement click<=8.0.4,>=7.0, but you have click 8.1.3.\r\nray 2.0.0 has requirement grpcio<=1.43.0,>=1.28.1; python_version < \"3.10\", but you have grpcio 1.54.2.\r\nrai-core-flask 0.6.0 has requirement gevent>=21.12.0, but you have gevent 1.3.6.\r\nrai-core-flask 0.6.0 has requirement Werkzeug<=2.2.3, but you have werkzeug 2.3.4.\r\npython-language-server 0.35.0 has requirement jedi<0.18.0,>=0.17.0, but you have jedi 0.18.0.\r\npyspark 3.3.1 has requirement py4j==0.10.9.5, but you have py4j 0.10.9.7.\r\nnbconvert 7.4.0 has requirement jinja2>=3.0, but you have jinja2 2.11.2.\r\njupyterlab 3.2.4 has requirement jupyter-server~=1.4, but you have jupyter-server 2.5.0.\r\njupyterlab 3.2.4 has requirement nbclassic~=0.2, but you have nbclassic 1.0.0.\r\njupyterlab-server 2.23.0 has requirement jinja2>=3.0.3, but you have jinja2 2.11.2.\r\ngrpcio-status 1.62.1 has requirement grpcio>=1.62.1, but you have grpcio 1.54.2.\r\ngrpcio-status 1.62.1 has requirement protobuf>=4.21.6, but you have protobuf 3.20.3.\r\nflask 2.3.2 has requirement Jinja2>=3.1.2, but you have jinja2 2.11.2.\r\nflake8 6.0.0 has requirement mccabe<0.8.0,>=0.7.0, but you have mccabe 0.6.1.\r\nflake8 6.0.0 has requirement pycodestyle<2.11.0,>=2.10.0, but you have pycodestyle 2.6.0.\r\nflake8 6.0.0 has requirement pyflakes<3.1.0,>=3.0.0, but you have pyflakes 2.2.0.\r\nfastparquet 2023.4.0 has requirement pandas>=1.5.0, but you have pandas 1.1.5.\r\ndatasets 2.3.2 has requirement dill<0.3.6, but you have dill 0.3.6.\r\ndask-sql 2023.6.0 has requirement pandas>=1.4.0, but you have pandas 1.1.5.\r\nazureml-inference-server-http 0.8.4 has requirement flask<2.3.0, but you have flask 2.3.2.\r\nazure-cli 2.49.0 has requirement azure-keyvault-keys==4.8.0b2, but you have azure-keyvault-keys 4.8.0.\r\nazure-cli 2.49.0 has requirement azure-mgmt-keyvault==10.2.0, but you have azure-mgmt-keyvault 10.2.1.\r\nazure-cli 2.49.0 has requirement azure-mgmt-resource==22.0.0, but you have azure-mgmt-resource 21.1.0b1.\r\nazure-cli-core 2.49.0 has requirement msal[broker]==1.20.0, but you have msal 1.22.0.\r\nautopep8 2.0.2 has requirement pycodestyle>=2.10.0, but you have pycodestyle 2.6.0.\r\nautokeras 1.0.16 has requirement tensorflow<=2.5.0,>=2.3.0, but you have tensorflow 2.11.0.\r\narviz 0.11.2 has requirement typing-extensions<4,>=3.7.4.3, but you have typing-extensions 4.6.0.\r\n"
+        }
+      ],
+      "execution_count": 4,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install protobuf==3.9.2 --force-reinstall"
+      ],
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": "Collecting protobuf==3.9.2\n  Downloading protobuf-3.9.2-py2.py3-none-any.whl (431 kB)\n\u001b[K     |████████████████████████████████| 431 kB 6.2 MB/s eta 0:00:01\n\u001b[?25hCollecting six>=1.9\n  Downloading six-1.16.0-py2.py3-none-any.whl (11 kB)\nCollecting setuptools\n  Downloading setuptools-69.5.0-py3-none-any.whl (893 kB)\n\u001b[K     |████████████████████████████████| 893 kB 20.9 MB/s eta 0:00:01\n\u001b[31mERROR: pandas-ml 0.6.1 requires enum34, which is not installed.\u001b[0m\n\u001b[31mERROR: tensorboardx 2.6.1 has requirement protobuf>=4.22.3, but you'll have protobuf 3.9.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: ray 2.0.0 has requirement click<=8.0.4,>=7.0, but you'll have click 8.1.3 which is incompatible.\u001b[0m\n\u001b[31mERROR: ray 2.0.0 has requirement grpcio<=1.43.0,>=1.28.1; python_version < \"3.10\", but you'll have grpcio 1.54.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: ray 2.0.0 has requirement protobuf<4.0.0,>=3.15.3, but you'll have protobuf 3.9.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: proto-plus 1.23.0 has requirement protobuf<5.0.0dev,>=3.19.0, but you'll have protobuf 3.9.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: onnx 1.13.1 has requirement protobuf<4,>=3.20.2, but you'll have protobuf 3.9.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: mlflow-skinny 2.3.2 has requirement protobuf<5,>=3.12.0, but you'll have protobuf 3.9.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: grpcio-status 1.62.1 has requirement grpcio>=1.62.1, but you'll have grpcio 1.54.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: grpcio-status 1.62.1 has requirement protobuf>=4.21.6, but you'll have protobuf 3.9.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: googleapis-common-protos 1.59.0 has requirement protobuf!=3.20.0,!=3.20.1,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<5.0.0dev,>=3.19.5, but you'll have protobuf 3.9.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: google-api-core 2.18.0 has requirement protobuf!=3.20.0,!=3.20.1,!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<5.0.0.dev0,>=3.19.5, but you'll have protobuf 3.9.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: fastparquet 2023.4.0 has requirement pandas>=1.5.0, but you'll have pandas 1.1.5 which is incompatible.\u001b[0m\n\u001b[31mERROR: datasets 2.3.2 has requirement dill<0.3.6, but you'll have dill 0.3.6 which is incompatible.\u001b[0m\n\u001b[31mERROR: dask-sql 2023.6.0 has requirement pandas>=1.4.0, but you'll have pandas 1.1.5 which is incompatible.\u001b[0m\n\u001b[31mERROR: azureml-inference-server-http 0.8.4 has requirement flask<2.3.0, but you'll have flask 2.3.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: azure-cli 2.49.0 has requirement azure-keyvault-keys==4.8.0b2, but you'll have azure-keyvault-keys 4.8.0 which is incompatible.\u001b[0m\n\u001b[31mERROR: azure-cli 2.49.0 has requirement azure-mgmt-keyvault==10.2.0, but you'll have azure-mgmt-keyvault 10.2.1 which is incompatible.\u001b[0m\n\u001b[31mERROR: azure-cli 2.49.0 has requirement azure-mgmt-resource==22.0.0, but you'll have azure-mgmt-resource 21.1.0b1 which is incompatible.\u001b[0m\n\u001b[31mERROR: azure-cli-core 2.49.0 has requirement msal[broker]==1.20.0, but you'll have msal 1.22.0 which is incompatible.\u001b[0m\n\u001b[31mERROR: autokeras 1.0.16 has requirement tensorflow<=2.5.0,>=2.3.0, but you'll have tensorflow 2.11.0 which is incompatible.\u001b[0m\n\u001b[31mERROR: arviz 0.11.2 has requirement typing-extensions<4,>=3.7.4.3, but you'll have typing-extensions 4.6.0 which is incompatible.\u001b[0m\n\u001b[?25hInstalling collected packages: six, setuptools, protobuf\n  Attempting uninstall: six\n    Found existing installation: six 1.16.0\n    Uninstalling six-1.16.0:\n      Successfully uninstalled six-1.16.0\n  Attempting uninstall: setuptools\n    Found existing installation: setuptools 65.6.3\n    Uninstalling setuptools-65.6.3:\n      Successfully uninstalled setuptools-65.6.3\n  Attempting uninstall: protobuf\n    Found existing installation: protobuf 3.20.3\n    Uninstalling protobuf-3.20.3:\n      Successfully uninstalled protobuf-3.20.3\nSuccessfully installed protobuf-3.9.2 setuptools-69.5.0 six-1.16.0\n"
+        }
+      ],
+      "execution_count": 5,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "!pip install google-cloud-bigquery --force-reinstall"
+      ],
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": "Collecting google-cloud-bigquery\n  Using cached google_cloud_bigquery-3.20.1-py2.py3-none-any.whl (233 kB)\nCollecting packaging>=20.0.0\n  Downloading packaging-24.0-py3-none-any.whl (53 kB)\n\u001b[K     |████████████████████████████████| 53 kB 1.6 MB/s eta 0:00:011\n\u001b[?25hCollecting google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1\n  Using cached google_api_core-2.18.0-py3-none-any.whl (138 kB)\nCollecting google-resumable-media<3.0dev,>=0.6.0\n  Using cached google_resumable_media-2.7.0-py2.py3-none-any.whl (80 kB)\nCollecting google-cloud-core<3.0.0dev,>=1.6.0\n  Using cached google_cloud_core-2.4.1-py2.py3-none-any.whl (29 kB)\nCollecting google-auth<3.0.0dev,>=2.14.1\n  Using cached google_auth-2.29.0-py2.py3-none-any.whl (189 kB)\nCollecting python-dateutil<3.0dev,>=2.7.2\n  Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)\n\u001b[K     |████████████████████████████████| 229 kB 12.0 MB/s eta 0:00:01\n\u001b[?25hCollecting requests<3.0.0dev,>=2.21.0\n  Downloading requests-2.31.0-py3-none-any.whl (62 kB)\n\u001b[K     |████████████████████████████████| 62 kB 718 kB/s  eta 0:00:01\n\u001b[?25hCollecting proto-plus<2.0.0dev,>=1.22.3\n  Using cached proto_plus-1.23.0-py3-none-any.whl (48 kB)\nCollecting protobuf!=3.20.0,!=3.20.1,!=4.21.0,!=4.21.1,!=4.21.2,!=4.21.3,!=4.21.4,!=4.21.5,<5.0.0.dev0,>=3.19.5\n  Downloading protobuf-4.25.3-cp37-abi3-manylinux2014_x86_64.whl (294 kB)\n\u001b[K     |████████████████████████████████| 294 kB 17.3 MB/s eta 0:00:01\n\u001b[?25hCollecting googleapis-common-protos<2.0.dev0,>=1.56.2\n  Downloading googleapis_common_protos-1.63.0-py2.py3-none-any.whl (229 kB)\n\u001b[K     |████████████████████████████████| 229 kB 19.5 MB/s eta 0:00:01\n\u001b[?25hCollecting grpcio<2.0dev,>=1.33.2; extra == \"grpc\"\n  Downloading grpcio-1.62.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (5.6 MB)\n\u001b[K     |████████████████████████████████| 5.6 MB 21.6 MB/s eta 0:00:01\n\u001b[?25hCollecting grpcio-status<2.0.dev0,>=1.33.2; extra == \"grpc\"\n  Using cached grpcio_status-1.62.1-py3-none-any.whl (14 kB)\nCollecting google-crc32c<2.0dev,>=1.0\n  Using cached google_crc32c-1.5.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (32 kB)\nCollecting rsa<5,>=3.1.4\n  Downloading rsa-4.9-py3-none-any.whl (34 kB)\nCollecting pyasn1-modules>=0.2.1\n  Downloading pyasn1_modules-0.4.0-py3-none-any.whl (181 kB)\n\u001b[K     |████████████████████████████████| 181 kB 85.7 MB/s eta 0:00:01\n\u001b[?25hCollecting cachetools<6.0,>=2.0.0\n  Downloading cachetools-5.3.3-py3-none-any.whl (9.3 kB)\nCollecting six>=1.5\n  Using cached six-1.16.0-py2.py3-none-any.whl (11 kB)\nCollecting idna<4,>=2.5\n  Downloading idna-3.7-py3-none-any.whl (66 kB)\n\u001b[K     |████████████████████████████████| 66 kB 5.7 MB/s  eta 0:00:01\n\u001b[?25hCollecting certifi>=2017.4.17\n  Downloading certifi-2024.2.2-py3-none-any.whl (163 kB)\n\u001b[K     |████████████████████████████████| 163 kB 82.0 MB/s eta 0:00:01\n\u001b[?25hCollecting urllib3<3,>=1.21.1\n  Downloading urllib3-2.2.1-py3-none-any.whl (121 kB)\n\u001b[K     |████████████████████████████████| 121 kB 105.7 MB/s eta 0:00:01\n\u001b[?25hCollecting charset-normalizer<4,>=2\n  Downloading charset_normalizer-3.3.2-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (141 kB)\n\u001b[K     |████████████████████████████████| 141 kB 89.3 MB/s eta 0:00:01\n\u001b[?25hCollecting pyasn1>=0.1.3\n  Downloading pyasn1-0.6.0-py2.py3-none-any.whl (85 kB)\n\u001b[K     |████████████████████████████████| 85 kB 4.3 MB/s  eta 0:00:01\n\u001b[31mERROR: pandas-ml 0.6.1 requires enum34, which is not installed.\u001b[0m\n\u001b[31mERROR: tensorflow 2.11.0 has requirement protobuf<3.20,>=3.9.2, but you'll have protobuf 4.25.3 which is incompatible.\u001b[0m\n\u001b[31mERROR: tensorboard 2.11.2 has requirement protobuf<4,>=3.9.2, but you'll have protobuf 4.25.3 which is incompatible.\u001b[0m\n\u001b[31mERROR: scikit-image 0.21.0 has requirement networkx>=2.8, but you'll have networkx 2.5 which is incompatible.\u001b[0m\n\u001b[31mERROR: scikit-image 0.21.0 has requirement scipy>=1.8, but you'll have scipy 1.5.3 which is incompatible.\u001b[0m\n\u001b[31mERROR: ray 2.0.0 has requirement click<=8.0.4,>=7.0, but you'll have click 8.1.3 which is incompatible.\u001b[0m\n\u001b[31mERROR: ray 2.0.0 has requirement grpcio<=1.43.0,>=1.28.1; python_version < \"3.10\", but you'll have grpcio 1.62.1 which is incompatible.\u001b[0m\n\u001b[31mERROR: ray 2.0.0 has requirement protobuf<4.0.0,>=3.15.3, but you'll have protobuf 4.25.3 which is incompatible.\u001b[0m\n\u001b[31mERROR: onnx 1.13.1 has requirement protobuf<4,>=3.20.2, but you'll have protobuf 4.25.3 which is incompatible.\u001b[0m\n\u001b[31mERROR: nbconvert 7.4.0 has requirement jinja2>=3.0, but you'll have jinja2 2.11.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: mlflow-skinny 2.3.2 has requirement packaging<24, but you'll have packaging 24.0 which is incompatible.\u001b[0m\n\u001b[31mERROR: jupyterlab 3.2.4 has requirement jupyter-server~=1.4, but you'll have jupyter-server 2.5.0 which is incompatible.\u001b[0m\n\u001b[31mERROR: jupyterlab 3.2.4 has requirement nbclassic~=0.2, but you'll have nbclassic 1.0.0 which is incompatible.\u001b[0m\n\u001b[31mERROR: jupyterlab-server 2.23.0 has requirement jinja2>=3.0.3, but you'll have jinja2 2.11.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: fastparquet 2023.4.0 has requirement pandas>=1.5.0, but you'll have pandas 1.1.5 which is incompatible.\u001b[0m\n\u001b[31mERROR: datasets 2.3.2 has requirement dill<0.3.6, but you'll have dill 0.3.6 which is incompatible.\u001b[0m\n\u001b[31mERROR: databricks-cli 0.17.7 has requirement urllib3<2.0.0,>=1.26.7, but you'll have urllib3 2.2.1 which is incompatible.\u001b[0m\n\u001b[31mERROR: dask-sql 2023.6.0 has requirement pandas>=1.4.0, but you'll have pandas 1.1.5 which is incompatible.\u001b[0m\n\u001b[31mERROR: botocore 1.23.19 has requirement urllib3<1.27,>=1.25.4, but you'll have urllib3 2.2.1 which is incompatible.\u001b[0m\n\u001b[31mERROR: azureml-inference-server-http 0.8.4 has requirement flask<2.3.0, but you'll have flask 2.3.2 which is incompatible.\u001b[0m\n\u001b[31mERROR: azureml-core 1.51.0 has requirement packaging<=23.0,>=20.0, but you'll have packaging 24.0 which is incompatible.\u001b[0m\n\u001b[31mERROR: azureml-core 1.51.0 has requirement urllib3<2.0.0,>=1.23, but you'll have urllib3 2.2.1 which is incompatible.\u001b[0m\n\u001b[31mERROR: azureml-automl-runtime 1.51.0.post1 has requirement protobuf<=3.20.3, but you'll have protobuf 4.25.3 which is incompatible.\u001b[0m\n\u001b[31mERROR: azure-cli 2.49.0 has requirement azure-keyvault-keys==4.8.0b2, but you'll have azure-keyvault-keys 4.8.0 which is incompatible.\u001b[0m\n\u001b[31mERROR: azure-cli 2.49.0 has requirement azure-mgmt-keyvault==10.2.0, but you'll have azure-mgmt-keyvault 10.2.1 which is incompatible.\u001b[0m\n\u001b[31mERROR: azure-cli 2.49.0 has requirement azure-mgmt-resource==22.0.0, but you'll have azure-mgmt-resource 21.1.0b1 which is incompatible.\u001b[0m\n\u001b[31mERROR: azure-cli-core 2.49.0 has requirement msal[broker]==1.20.0, but you'll have msal 1.22.0 which is incompatible.\u001b[0m\n\u001b[31mERROR: autokeras 1.0.16 has requirement tensorflow<=2.5.0,>=2.3.0, but you'll have tensorflow 2.11.0 which is incompatible.\u001b[0m\n\u001b[31mERROR: arviz 0.11.2 has requirement typing-extensions<4,>=3.7.4.3, but you'll have typing-extensions 4.6.0 which is incompatible.\u001b[0m\n\u001b[?25hInstalling collected packages: packaging, pyasn1, rsa, pyasn1-modules, cachetools, google-auth, protobuf, proto-plus, googleapis-common-protos, idna, certifi, urllib3, charset-normalizer, requests, grpcio, grpcio-status, google-api-core, google-crc32c, google-resumable-media, google-cloud-core, six, python-dateutil, google-cloud-bigquery\n  Attempting uninstall: packaging\n    Found existing installation: packaging 23.0\n    Uninstalling packaging-23.0:\n      Successfully uninstalled packaging-23.0\n  Attempting uninstall: pyasn1\n    Found existing installation: pyasn1 0.5.0\n    Uninstalling pyasn1-0.5.0:\n      Successfully uninstalled pyasn1-0.5.0\n  Attempting uninstall: rsa\n    Found existing installation: rsa 4.9\n    Uninstalling rsa-4.9:\n      Successfully uninstalled rsa-4.9\n  Attempting uninstall: pyasn1-modules\n    Found existing installation: pyasn1-modules 0.3.0\n    Uninstalling pyasn1-modules-0.3.0:\n      Successfully uninstalled pyasn1-modules-0.3.0\n  Attempting uninstall: cachetools\n    Found existing installation: cachetools 5.3.0\n    Uninstalling cachetools-5.3.0:\n      Successfully uninstalled cachetools-5.3.0\n  Attempting uninstall: google-auth\n    Found existing installation: google-auth 2.29.0\n    Uninstalling google-auth-2.29.0:\n      Successfully uninstalled google-auth-2.29.0\n  Attempting uninstall: protobuf\n    Found existing installation: protobuf 3.9.2\n    Uninstalling protobuf-3.9.2:\n      Successfully uninstalled protobuf-3.9.2\n  Attempting uninstall: proto-plus\n    Found existing installation: proto-plus 1.23.0\n    Uninstalling proto-plus-1.23.0:\n      Successfully uninstalled proto-plus-1.23.0\n  Attempting uninstall: googleapis-common-protos\n    Found existing installation: googleapis-common-protos 1.59.0\n    Uninstalling googleapis-common-protos-1.59.0:\n      Successfully uninstalled googleapis-common-protos-1.59.0\n  Attempting uninstall: idna\n    Found existing installation: idna 3.4\n    Uninstalling idna-3.4:\n      Successfully uninstalled idna-3.4\n  Attempting uninstall: certifi\n    Found existing installation: certifi 2022.9.24\n    Uninstalling certifi-2022.9.24:\n      Successfully uninstalled certifi-2022.9.24\n  Attempting uninstall: urllib3\n    Found existing installation: urllib3 1.26.16\n    Uninstalling urllib3-1.26.16:\n      Successfully uninstalled urllib3-1.26.16\n  Attempting uninstall: charset-normalizer\n    Found existing installation: charset-normalizer 3.1.0\n    Uninstalling charset-normalizer-3.1.0:\n      Successfully uninstalled charset-normalizer-3.1.0\n  Attempting uninstall: requests\n    Found existing installation: requests 2.31.0\n    Uninstalling requests-2.31.0:\n      Successfully uninstalled requests-2.31.0\n  Attempting uninstall: grpcio\n    Found existing installation: grpcio 1.54.2\n    Uninstalling grpcio-1.54.2:\n      Successfully uninstalled grpcio-1.54.2\n  Attempting uninstall: grpcio-status\n    Found existing installation: grpcio-status 1.62.1\n    Uninstalling grpcio-status-1.62.1:\n      Successfully uninstalled grpcio-status-1.62.1\n  Attempting uninstall: google-api-core\n    Found existing installation: google-api-core 2.18.0\n    Uninstalling google-api-core-2.18.0:\n      Successfully uninstalled google-api-core-2.18.0\n  Attempting uninstall: google-crc32c\n    Found existing installation: google-crc32c 1.5.0\n    Uninstalling google-crc32c-1.5.0:\n      Successfully uninstalled google-crc32c-1.5.0\n  Attempting uninstall: google-resumable-media\n    Found existing installation: google-resumable-media 2.7.0\n    Uninstalling google-resumable-media-2.7.0:\n      Successfully uninstalled google-resumable-media-2.7.0\n  Attempting uninstall: google-cloud-core\n    Found existing installation: google-cloud-core 2.4.1\n    Uninstalling google-cloud-core-2.4.1:\n      Successfully uninstalled google-cloud-core-2.4.1\n  Attempting uninstall: six\n    Found existing installation: six 1.16.0\n    Uninstalling six-1.16.0:\n      Successfully uninstalled six-1.16.0\n  Attempting uninstall: python-dateutil\n    Found existing installation: python-dateutil 2.8.2\n    Uninstalling python-dateutil-2.8.2:\n      Successfully uninstalled python-dateutil-2.8.2\n  Attempting uninstall: google-cloud-bigquery\n    Found existing installation: google-cloud-bigquery 3.20.1\n    Uninstalling google-cloud-bigquery-3.20.1:\n      Successfully uninstalled google-cloud-bigquery-3.20.1\nSuccessfully installed cachetools-5.3.3 certifi-2024.2.2 charset-normalizer-3.3.2 google-api-core-2.18.0 google-auth-2.29.0 google-cloud-bigquery-3.20.1 google-cloud-core-2.4.1 google-crc32c-1.5.0 google-resumable-media-2.7.0 googleapis-common-protos-1.63.0 grpcio-1.62.1 grpcio-status-1.62.1 idna-3.7 packaging-24.0 proto-plus-1.23.0 protobuf-4.25.3 pyasn1-0.6.0 pyasn1-modules-0.4.0 python-dateutil-2.9.0.post0 requests-2.31.0 rsa-4.9 six-1.16.0 urllib3-2.2.1\n"
+        }
+      ],
+      "execution_count": 8,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "from google.cloud import bigquery\n",
+        "from google.oauth2 import service_account\n",
+        "\n",
+        "# Path to the service account key file\n",
+        "key_path = \"Users/cfuser27/hsph-2023-bbfa00df0734.json\"\n",
+        "\n",
+        "# Create credentials using the downloaded service account key\n",
+        "credentials = service_account.Credentials.from_service_account_file(key_path)\n",
+        "\n",
+        "# Construct a BigQuery client object\n",
+        "client = bigquery.Client(credentials=credentials, project=credentials.project_id)\n",
+        "\n",
+        "# Define your BigQuery SQL query here\n",
+        "query = \"\"\"\n",
+        "SELECT *\n",
+        "FROM `hsph_2023.physionet-data.mimiciv_icu.chartevents`\n",
+        "LIMIT 10\n",
+        "\"\"\"\n",
+        "\n",
+        "# Execute the query and get the result\n",
+        "query_job = client.query(query)\n",
+        "results = query_job.result()  # Waits for the job to complete\n",
+        "\n",
+        "# Print the results\n",
+        "for row in results:\n",
+        "    print(dict(row))\n",
+        "\n"
+      ],
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "ImportError",
+          "evalue": "cannot import name 'bigquery' from 'google.cloud' (unknown location)",
+          "traceback": [
+            "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+            "\u001b[0;31mImportError\u001b[0m                               Traceback (most recent call last)",
+            "Cell \u001b[0;32mIn[9], line 1\u001b[0m\n\u001b[0;32m----> 1\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m \u001b[38;5;21;01mgoogle\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mcloud\u001b[39;00m \u001b[38;5;28;01mimport\u001b[39;00m bigquery\n\u001b[1;32m      2\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m \u001b[38;5;21;01mgoogle\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01moauth2\u001b[39;00m \u001b[38;5;28;01mimport\u001b[39;00m service_account\n\u001b[1;32m      4\u001b[0m \u001b[38;5;66;03m# Path to the service account key file\u001b[39;00m\n",
+            "\u001b[0;31mImportError\u001b[0m: cannot import name 'bigquery' from 'google.cloud' (unknown location)"
+          ]
+        }
+      ],
+      "execution_count": 9,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        },
+        "gather": {
+          "logged": 1713031098554
+        }
+      }
+    },
+    {
+      "cell_type": "code",
+      "source": [],
+      "outputs": [],
+      "execution_count": null,
+      "metadata": {
+        "jupyter": {
+          "source_hidden": false,
+          "outputs_hidden": false
+        },
+        "nteract": {
+          "transient": {
+            "deleting": false
+          }
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "kernelspec": {
+      "name": "python310-sdkv2",
+      "language": "python",
+      "display_name": "Python 3.10 - SDK v2"
+    },
+    "language_info": {
+      "name": "python",
+      "version": "3.10.11",
+      "mimetype": "text/x-python",
+      "codemirror_mode": {
+        "name": "ipython",
+        "version": 3
+      },
+      "pygments_lexer": "ipython3",
+      "nbconvert_exporter": "python",
+      "file_extension": ".py"
+    },
+    "microsoft": {
+      "ms_spell_check": {
+        "ms_spell_check_language": "en"
+      }
+    },
+    "kernel_info": {
+      "name": "python310-sdkv2"
+    },
+    "nteract": {
+      "version": "nteract-front-end@1.0.0"
+    }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 2
+}
